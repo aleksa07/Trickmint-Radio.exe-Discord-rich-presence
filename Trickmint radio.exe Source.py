@@ -9,16 +9,13 @@ import keyboard
 import time
 
 import requests
-import shutil
-import subprocess
 import sys
+import webbrowser
 
 # Version checker
 CURRENT_VERSION = '1.0'
 GITHUB_REPO = 'aleksa07/Trickmint-Radio.exe-Discord-rich-presence'
 RELEASE_URL = f'https://api.github.com/repos/{GITHUB_REPO}/releases/latest'
-EXE_NAME = 'trickmint radio.exe'
-print("Checking version.")
 
 def get_latest_release():
     response = requests.get(RELEASE_URL)
@@ -29,36 +26,20 @@ def is_new_version(latest_release):
     latest_version = latest_release['tag_name']
     return latest_version != CURRENT_VERSION and not latest_release.get('prerelease', False)
 
-def download_latest_release(latest_release):
-    for asset in latest_release['assets']:
-        if asset['name'].endswith('.exe'):
-            download_url = asset['browser_download_url']
-            response = requests.get(download_url, stream=True)
-            with open(EXE_NAME, 'wb') as file:
-                shutil.copyfileobj(response.raw, file)
-            return EXE_NAME
-    return None
-
-def replace_and_restart(new_exe):
-    current_exe = sys.executable
-    if os.path.exists(current_exe):
-        os.remove(current_exe)
-    shutil.move(new_exe, current_exe)
-    subprocess.Popen([current_exe])
-    sys.exit()
-
 def main():
     latest_release = get_latest_release()
     if is_new_version(latest_release):
-        print(f"New version available: {latest_release['tag_name']}. Updating...")
-        new_exe = download_latest_release(latest_release)
-        if new_exe:
-            replace_and_restart(new_exe)
+        print(f"New version available: {latest_release['tag_name']}.")
+        answer = input("Do you want to open the GitHub releases page to dwonload the update? (y/n): ").strip().lower()
+        if answer == 'y':
+            webbrowser.open(f'https://github.com/{GITHUB_REPO}/releases/latest')
+            sys.exit()
     else:
         print("You are already using the latest version.")
 
 if __name__ == '__main__':
     main()
+
 
 
 # The code that makes it work
