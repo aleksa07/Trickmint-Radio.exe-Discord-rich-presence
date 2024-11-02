@@ -14,4 +14,4 @@ pip install pypresence
 pip install keyboard # find it kinda funny tho
 pip install selenium
 ```
-3. Then just run the python script and you are good
+3. Then just run the python script and you are good to go
