@@ -3,24 +3,24 @@ A Discord rich presence for trickmint.gay website
 
 This a Discord rich presence for the website [http://trickmint.gay/](http://trickmint.gay/) you should defintly go check it out.
 
-# Controlrs
+# Controls
 alt+f9 - pause and play
 
 alt+f10 - skip song
 
 alt+f11 - random spearmint
 
->in the future and gonna make it so u can change what keybinds to use
+>in the future, I'll add a feature to change keybinds.
 
 # Releases
-Go to the releases tab for the exe with bult in binares
+Go to the releases tab for the exe with built in binaries
 
 # Building from Source
 1. Get the source code
-2. Make sure u did:
+2. Make sure u ran:
 ```
 pip install pypresence
 pip install keyboard # find it kinda funny tho
 pip install selenium
 ```
-3. Then just run the python script and you are good to go
+3. Then just run the python script and you're good to go!
