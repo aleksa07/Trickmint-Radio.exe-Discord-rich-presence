@@ -3,6 +3,15 @@ A Discord rich presence for trickmint.gay website
 
 This a Discord rich presence for the website [http://trickmint.gay/](http://trickmint.gay/) you should defintly go check it out.
 
+# Controlrs
+alt+f9 - pause and play
+
+alt+f10 - skip song
+
+alt+f11 - random spearmint
+
+>in the future and gonna make it so u can change what keybinds
+
 # Releases
 Go to the releases tab for the exe with bult in binares
 
