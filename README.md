@@ -10,9 +10,8 @@ Go to the releases tab for the exe with bult in binares
 1. Get the source code
 2. Make sure u did:
 ```
-    pip install pypresence
-    pip install keyboard #find it kinda funny tho
-    pip install selenium
-
+pip install pypresence
+pip install keyboard # find it kinda funny tho
+pip install selenium
 ```
 3. Then just run the python script and you are good
