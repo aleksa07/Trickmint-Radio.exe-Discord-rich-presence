@@ -10,7 +10,7 @@ alt+f10 - skip song
 
 alt+f11 - random spearmint
 
->in the future and gonna make it so u can change what keybinds
+>in the future and gonna make it so u can change what keybinds to use
 
 # Releases
 Go to the releases tab for the exe with bult in binares
