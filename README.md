@@ -20,7 +20,7 @@ Go to the releases tab for the exe with built in binaries
 2. Make sure u ran:
 ```
 pip install pypresence
-pip install keyboard # find it kinda funny tho
+pip install keyboard
 pip install selenium
 ```
 3. Then just run the python script and you're good to go!
