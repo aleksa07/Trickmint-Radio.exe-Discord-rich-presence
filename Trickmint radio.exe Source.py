@@ -19,7 +19,7 @@ client_id = '1299741681452843139'
 discord_presence = Presence(client_id)
 
 # Version checker
-CURRENT_VERSION = '1.0'
+CURRENT_VERSION = '1.1'
 GITHUB_REPO = 'aleksa07/Trickmint-Radio.exe-Discord-rich-presence'
 RELEASE_URL = f'https://api.github.com/repos/{GITHUB_REPO}/releases/latest'
 
