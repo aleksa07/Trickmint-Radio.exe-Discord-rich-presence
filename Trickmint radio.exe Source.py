@@ -12,6 +12,12 @@ import requests
 import sys
 import webbrowser
 
+# Variables that not to touch
+song = "a"
+play = True
+client_id = '1299741681452843139'
+discord_presence = Presence(client_id)
+
 # Version checker
 CURRENT_VERSION = '1.0'
 GITHUB_REPO = 'aleksa07/Trickmint-Radio.exe-Discord-rich-presence'
@@ -115,9 +121,7 @@ if not setup:
     driver.get('https://trickmint.gay/')
 
 
-play = True
-client_id = '1299741681452843139'
-discord_presence = Presence(client_id)
+
 
 def Connect():
     try:
@@ -130,19 +134,21 @@ Connect()
 
 def playbutton():
     try:
-        play_button = driver.find_element(By.ID, 'playtoggle')
-        play_button.click()
+        iframe = driver.find_element(By.XPATH, "/html/body/main/div[1]/div[1]/div[2]/iframe")
+        driver.switch_to.frame(iframe)
+        play_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//button[@aria-label="Play"]'))).click()
+        driver.switch_to.default_content()
     except Exception as e:
         print(f"Error clicking play button: {e}")
 
-def Song():
-    global play
-    if not play:
-        play = True
-        playbutton()
-    else:
-        play = False 
-        playbutton()   
+# def Song():
+#     global play
+#     if not play:
+#         play = True
+#         playbutton()
+#     else:
+#         play = False 
+#         playbutton()   
 
 def Spearmint():
     driver.execute_script("refreshSpearmint();")
@@ -150,15 +156,30 @@ def Spearmint():
 def Skipsong():
     driver.execute_script("skipSong();")
 
-keyboard.add_hotkey("alt+f9", Song)
-keyboard.add_hotkey("alt+f10", Skipsong)
+
+# Keybinds (disabled ones here are broken or just wierd think i cant fix)
+# keyboard.add_hotkey("alt+f9", Song)
+# keyboard.add_hotkey("alt+f10", Skipsong)
 keyboard.add_hotkey("alt+f11", Spearmint)
 
 def whatsong():
     global play
+    global song
     if play:
-        song = driver.execute_script("return titleTxt.textContent;")
-        return song
+        iframe = driver.find_element(By.XPATH, "/html/body/main/div[1]/div[1]/div[2]/iframe")
+        driver.switch_to.frame(iframe)
+        songtext = driver.find_element(By.CLASS_NAME, "ytp-title-link").text
+        driver.switch_to.default_content()
+        if songtext != "":
+            song = songtext
+            return song
+        elif songtext != song:
+            return song
+    
+def ShowSong():
+    driver.execute_script('toggleRadio()')
+
+
     
 
 def getimgurl():
@@ -173,8 +194,11 @@ def whodraw():
         draw = "by trickmint"
     return draw
 
+ShowSong()
 playbutton()
 
+
+time.sleep(1)
 while True:
     try:
         Image = getimgurl()
