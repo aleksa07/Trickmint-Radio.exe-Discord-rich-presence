@@ -2,6 +2,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.options import Options as Fopt
+from selenium.webdriver.chrome.options import Options as COpt
 from pypresence import Presence
 import pickle
 import os
@@ -12,14 +14,15 @@ import requests
 import sys
 import webbrowser
 
-# Variables that not to touch
-song = "a"
-play = True
+# This is for the Client ID for the rich Presence (You can change it out for yours)
 client_id = '1299741681452843139'
+
+# Variables that not to touch
+play = True
 discord_presence = Presence(client_id)
 
 # Version checker
-CURRENT_VERSION = '1.1'
+CURRENT_VERSION = '1.2'
 GITHUB_REPO = 'aleksa07/Trickmint-Radio.exe-Discord-rich-presence'
 RELEASE_URL = f'https://api.github.com/repos/{GITHUB_REPO}/releases/latest'
 
@@ -48,8 +51,12 @@ if __name__ == '__main__':
 
 
 
-# The code that makes it work
+# This the starting and loading config and what browser using
 configfile = 'config.pkl'
+
+print("Starting Trickmint Radio.exe")
+
+
 
 def loadconfig():
     if os.path.exists(configfile):
@@ -69,9 +76,14 @@ setup = True
 if config.get('Setup'):
     if config.get('Browser') == 'Firefox':
         driver = webdriver.Firefox()
+        if config.get('AddblockF Path'):
+            driver.install_addon(config.get('AddblockF Path'))
         driver.get('https://trickmint.gay/')
     elif config.get('Browser') == 'Chrome':
-        driver = webdriver.Chrome()
+        if config.get('AddblockC Path'):
+            option = COpt()
+            option.add_extension(config.get('AddblockC Path'))        
+        driver = webdriver.Chrome(option)
         driver.get('https://trickmint.gay/')
     elif config.get('Browser') == 'Edge':
         driver = webdriver.Edge()
@@ -83,6 +95,32 @@ else:
     print("Runing first time Setup.")
     setup = False
 
+# Setup for a AddBlocker cause god forbid Youtube not to send 50 billion adds on the next song
+def AddBlockSetupF():
+    try:
+        Want = input("Want to use a addblocker (Y/N): ")
+        if Want == "y" or Want == "Y":
+            path = input("Please put a path to the addblocker (Firefox = .xpi You can get this from my github): ")
+            config['AddblockF Path'] = path
+            saveconfig(config)
+        else:
+            return {}
+    except Exception as error:
+        print("There was a error Trying again")
+        AddBlockSetupF()
+
+def AddBlockSetupC():
+    try:
+        Want = input("Want to use a addblocker (Y/N): ")
+        if Want == "y" or Want == "Y":
+            path = input("Please put a path to the addblocker (Chrome = .crx You can get this from my github): ")
+            config['AddblockC Path'] = path
+            saveconfig(config)
+        else:
+            return {}
+    except Exception as error:
+        print("There was a error Trying again")
+        AddBlockSetupC()
 
 def Setup():
     num = input("Which browser would you like to use: 1 = Firefox, 2 = Chrome, 3 = Edge, 4 = Safari (untested): ") 
@@ -91,12 +129,23 @@ def Setup():
             config['Browser'] = 'Firefox'
             config['Setup'] = True
             saveconfig(config)
+            AddBlockSetupF()
             return webdriver.Firefox()
         elif int(num) == 2:
             config['Browser'] = 'Chrome'
             config['Setup'] = True
+            AddBlockSetupC()
+            if config.get('AddblockC Path'):
+                    try:
+                        option = COpt()
+                        option.add_extension(config.get('AddblockC Path'))
+                        return webdriver.Chrome(option)
+                    except Exception as e:
+                        print("error retrying addblock setup Chrome Retrying Setup")
+                        AddBlockSetupC
+            else:
+                return webdriver.Chrome()
             saveconfig(config)
-            return webdriver.Chrome()
         elif int(num) == 3:
             config['Browser'] = 'Edge'
             config['Setup'] = True
@@ -118,10 +167,16 @@ def Setup():
 
 if not setup:
     driver = Setup()
+    if config.get('AddblockF Path') and config.get('Browser') == 'Firefox':
+            try:
+                driver.install_addon(config['AddblockF Path'])
+            except Exception as e:
+                print("error retrying addblock setup FireFox Retrying Setup")
+                AddBlockSetupF
     driver.get('https://trickmint.gay/')
 
 
-
+# This where it starts the Connect is the discord client
 
 def Connect():
     try:
@@ -132,57 +187,78 @@ def Connect():
         Connect()
 Connect()
 
+# These ones are for the refrencing frames and going into them of how wikplayer works
+def TrickmintGayFrame():
+    driver.switch_to.default_content()
+    iframe = driver.find_element(By.XPATH, "/html/body/iframe")
+    driver.switch_to.frame(iframe)
+    iframe = driver.find_element(By.NAME, "content")
+    driver.switch_to.frame(iframe)
+
+def WikFrame():
+    driver.switch_to.default_content()
+    iframe = driver.find_element(By.XPATH, "/html/body/iframe")
+    driver.switch_to.frame(iframe)
+
+# This is because of some reason of the wikplayer not autoplaying?? whatever
+
+def Initianon():
+    WikFrame()
+    play_button = driver.find_element(By.ID, 'pause').click()
+    time.sleep(0.6)
+    WikFrame()
+    play_button = driver.find_element(By.ID, 'play').click()
+
+
+# all of These are the one controlling and hiting buttons on the website using keybinds
 def playbutton():
     try:
-        iframe = driver.find_element(By.XPATH, "/html/body/main/div[1]/div[1]/div[2]/iframe")
-        driver.switch_to.frame(iframe)
-        play_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '//button[@aria-label="Play"]'))).click()
-        driver.switch_to.default_content()
+        global play
+        if not play:
+            WikFrame()
+            play_button = driver.find_element(By.ID, 'pause').click()
+        else:
+            WikFrame()
+            play_button = driver.find_element(By.ID, 'play').click()
+        
     except Exception as e:
         print(f"Error clicking play button: {e}")
 
-# def Song():
-#     global play
-#     if not play:
-#         play = True
-#         playbutton()
-#     else:
-#         play = False 
-#         playbutton()   
+def Song():
+    global play
+    if not play:
+        play = True
+        playbutton()
+    else:
+        play = False 
+        playbutton()   
 
 def Spearmint():
+    TrickmintGayFrame()
     driver.execute_script("refreshSpearmint();")
     
-def Skipsong():
-    driver.execute_script("skipSong();")
+def SkipSong():
+    WikFrame()
+    driver.find_element(By.ID, 'next').click()
 
+def PreviousSong():
+    WikFrame()
+    driver.find_element(By.ID, 'previous').click()
 
-# Keybinds (disabled ones here are broken or just wierd think i cant fix)
-# keyboard.add_hotkey("alt+f9", Song)
-# keyboard.add_hotkey("alt+f10", Skipsong)
-keyboard.add_hotkey("alt+f11", Spearmint)
 
 def whatsong():
     global play
-    global song
     if play:
-        iframe = driver.find_element(By.XPATH, "/html/body/main/div[1]/div[1]/div[2]/iframe")
-        driver.switch_to.frame(iframe)
-        songtext = driver.find_element(By.CLASS_NAME, "ytp-title-link").text
+        WikFrame()
+        songtext = driver.find_element(By.CLASS_NAME, "jp-scrollingtext").text
+        Timer = driver.find_element(By.ID, 'timer').text
+        Thesong = songtext + " " + f"({Timer})"
         driver.switch_to.default_content()
-        if songtext != "":
-            song = songtext
-            return song
-        elif songtext != song:
-            return song
-    
-def ShowSong():
-    driver.execute_script('toggleRadio()')
-
-
+        return Thesong
     
 
 def getimgurl():
+    TrickmintGayFrame()
     img = driver.find_element(By.ID, "spearmint")
     img = img.get_attribute("src")
     return img
@@ -194,35 +270,47 @@ def whodraw():
         draw = "by trickmint"
     return draw
 
-ShowSong()
-playbutton()
+
+# Keybinds (Thank you trickmint for using wikplayer very awesome for me to add theses buttons)
+keyboard.add_hotkey("alt+f10", Song)
+keyboard.add_hotkey("alt+f9", PreviousSong)
+keyboard.add_hotkey("alt+f11", SkipSong)
+keyboard.add_hotkey("alt+f12", Spearmint)
 
 
-time.sleep(1)
+# This some things to make it autoplay before the loop
+time.sleep(5)
+Initianon()
+if os.name == 'nt':
+    os.system('cls')  # For Windows
+else:
+    os.system('clear')  # For Linux/macOS
+print("Welcome To Trickmint Radio.exe")
+# This the loop for the discord rich presence
 while True:
     try:
+        time.sleep(1)
         Image = getimgurl()
         CREDITS = whodraw()
         current_song = whatsong()
-        time.sleep(1)
         if play:
             discord_presence.update(
                 state=current_song, 
                 details="Now Playing",
-                large_image="radioicon",
-                large_text="Trickmint Radio",
-                small_image=Image,
-                small_text=f"spearmint {CREDITS}",
+                large_image=Image,
+                large_text=f"spearmint {CREDITS}",
+                small_image="radioicon",
+                small_text="Trickmint Radio",
                 buttons=[{"label": "Trickmint's website", "url": "https://trickmint.gay/"}]
             )
         else:
             discord_presence.update(
                 state="Not Listening to anything",
                 details="Boo",
-                large_image="radioicon",
-                large_text="Trickmint Radio",
-                small_image=Image,
-                small_text=f"spearmint {CREDITS}",
+                large_image=Image,
+                large_text=f"spearmint {CREDITS}",
+                small_image="radioicon",
+                small_text="Trickmint Radio",
                 buttons=[{"label": "Trickmint's website", "url": "https://trickmint.gay/"}]
             )
     except Exception as e:
