@@ -22,7 +22,8 @@ play = True
 discord_presence = Presence(client_id)
 
 # Version checker
-CURRENT_VERSION = '1.2'
+print("Checking for Updates")
+CURRENT_VERSION = '1.2.1'
 GITHUB_REPO = 'aleksa07/Trickmint-Radio.exe-Discord-rich-presence'
 RELEASE_URL = f'https://api.github.com/repos/{GITHUB_REPO}/releases/latest'
 
@@ -205,7 +206,7 @@ def WikFrame():
 def Initianon():
     WikFrame()
     play_button = driver.find_element(By.ID, 'pause').click()
-    time.sleep(0.6)
+    time.sleep(0.3)
     WikFrame()
     play_button = driver.find_element(By.ID, 'play').click()
 
@@ -251,10 +252,16 @@ def whatsong():
     if play:
         WikFrame()
         songtext = driver.find_element(By.CLASS_NAME, "jp-scrollingtext").text
-        Timer = driver.find_element(By.ID, 'timer').text
-        Thesong = songtext + " " + f"({Timer})"
         driver.switch_to.default_content()
-        return Thesong
+        return songtext
+
+def Timer():
+    global play
+    if play:
+        WikFrame()
+        Timer = driver.find_element(By.ID, 'timer').text
+        driver.switch_to.default_content()
+        return Timer
     
 
 def getimgurl():
@@ -293,15 +300,16 @@ while True:
         Image = getimgurl()
         CREDITS = whodraw()
         current_song = whatsong()
+        TheLenght = Timer()
         if play:
             discord_presence.update(
                 state=current_song, 
-                details="Now Playing",
+                details=f"Now Playing ({TheLenght})",
                 large_image=Image,
                 large_text=f"spearmint {CREDITS}",
                 small_image="radioicon",
                 small_text="Trickmint Radio",
-                buttons=[{"label": "Trickmint's website", "url": "https://trickmint.gay/"}]
+                buttons=[{"label": "Trickmint's website", "url": "https://trickmint.gay/"}, {"label": "Download Trickmint Radio.exe", "url": "https://github.com/aleksa07/Trickmint-Radio.exe-Discord-rich-presence"}]
             )
         else:
             discord_presence.update(
@@ -311,7 +319,7 @@ while True:
                 large_text=f"spearmint {CREDITS}",
                 small_image="radioicon",
                 small_text="Trickmint Radio",
-                buttons=[{"label": "Trickmint's website", "url": "https://trickmint.gay/"}]
+                buttons=[{"label": "Trickmint's website", "url": "https://trickmint.gay/"}, {"label": "Download Trickmint Radio.exe", "url": "https://github.com/aleksa07/Trickmint-Radio.exe-Discord-rich-presence"}]
             )
     except Exception as e:
         print(f"Error on discord rich presence: {e}")
