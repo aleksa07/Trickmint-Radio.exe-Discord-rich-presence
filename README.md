@@ -1,3 +1,7 @@
+# BROKEN
+For now it's broken until the website puts back the music player on
+
+
 # Trickmint Radio.exe Discord rich presence
 A Discord rich presence for trickmint.gay website
 
